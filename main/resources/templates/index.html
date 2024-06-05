@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Система «Перевозка грузов»</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+
+  <style>
+    body {
+      background-image: url("https://img.freepik.com/premium-vector/city-transport-line-seamless-pattern-vector-illustration-of-outline-background_520826-326.jpg");
+      background-color: rgba(39, 63, 112);
+      background-blend-mode: multiply;
+    }
+    h1, h4, h5, th, tr, td, thead, tbody {
+      color: white;
+    }
+
+  </style>
+</head>
+<body>
+<script src="http://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+<script>
+  function googleTranslateElementInit() {
+    new google.translate.TranslateElement(
+            {pageLanguage: 'ru'},
+            'google_translate_element'
+    );
+  }
+</script>
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"
+        integrity="sha384-tsQFqpEReu7ZLhBV2VZlAu7zcOV+rXbYlF2cqB8txI/8aZajjp4Bqd+V6D5IgvKT"
+        crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+        crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+        crossorigin="anonymous"></script>
+<nav class="navbar navbar-expand-lg navbar-dark justify-content-between" style="background-color: rgba(9,11,42,0.80)">
+  </ul>
+  <div class="container-fluid">
+    <a class="navbar-brand" th:href="@{/index}">Перевозка грузов</a>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" th:href="@{/blog}">Блог</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" th:href="@{/users}">Пользователи</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" th:href="@{/logout}">Выход</a>
+        </li>
+      </ul>
+    </div>
+    <div id="google_translate_element"></div>
+  </div>
+</nav>
+<div class="wrapper" style="max-width: 1200px; margin: 0 auto">
+  <br>
+  <blockquote class="blockquote text-center"><h1>Перевозка грузов</h1></blockquote>
+  <div class="row">
+    <div class="text-center">
+      <h4>Поиск груза по любому критерию:</h4>
+      <form th:action="@{/}">
+        <input type="text" name="keyword" id="keyword" size="30" th:value="${keyword}" required/>
+        <input type="submit" class="btn btn-success btn-sm" value="Поиск"/>
+        <input type="button" class="btn btn-warning btn-sm" value="Очистить" id="btnClear"
+               onclick="clearSearch()"/>
+      </form>
+    </div>
+  </div>
+  <table id="1" class="table table-striped  table-hover">
+    <thead>
+    <tr>
+      <th scope="col" onclick="sortTable(0)" style="cursor: pointer">ID</th>
+      <th scope="col">Название груза</th>
+      <th scope="col">Содержимое груза</th>
+      <th scope="col">Город отправки груза</th>
+      <th scope="col" onclick="sortTable(4)" style="cursor: pointer">Дата отправки груза</th>
+      <th scope="col">Город прибытия груза</th>
+      <th scope="col">Дата прибытия груза</th>
+      <th scope="col">Действия</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="cargo: ${listCargo}">
+      <th scope="row" class="text-white" th:text="${cargo.id}">ID отстутсвует</th>
+      <th scope="row" class="text-white" th:text="${cargo.name}">Название груза отсутствует</th>
+      <th scope="row" class="text-white" th:text="${cargo.content}">Содержимое груза отсутствует</th>
+      <th scope="row" class="text-white" th:text="${cargo.from_city}">Город отправки груза отсутствует</th>
+      <th scope="row" class="text-white date" th:text="${cargo.date_of_shipping}">Дата отправки груза отсутствует</th>
+      <th scope="row" class="text-white" th:text="${cargo.to_city}">Город прибытия груза отсутствует</th>
+      <th scope="row" class="text-white" th:text="${cargo.date_of_arrival}">Дата прибытия груза отсутствует</th>
+      <th>
+        <button id="edit-cargo" type="button" class="btn btn-primary" data-toggle="modal" data-target="#cargoEditDialog" th:data-cargoId="${cargo.id}"><i class="fas fa-edit"></i></button>
+        <!--        <a th:href="@{'/edit/'+${cargo.id}}"><button type="button" class="btn btn-primary" ><i class="fas fa-edit"></i></button></a>-->
+        <a th:href="@{'/delete/'+${cargo.id}}"><button type="button" class="btn btn-danger"><i class="far fa-trash-alt"></i></button></a>
+      </th>
+    </tr>
+    </tbody>
+  </table>
+  <p class="text-white">
+    <script type="text/javascript">
+      function getRowsColumn() {
+        let table = document.getElementById('1')
+        let tBody = table.querySelector('tbody')
+        const count = tBody.querySelectorAll('tr').length;
+        document.write('Количество грузов в таблице: ' + count)
+      }
+
+      getRowsColumn()
+    </script>
+  </p>
+  <blockquote class="blockquote text-center">
+    <!--    <a href="/new">-->
+    <!--      <button type="button" class="btn btn-primary" data-togge="button" aria-pressed="false" autocomplete="off">-->
+    <!--        Добавить груз-->
+    <!--      </button>-->
+    <!--    </a>-->
+    <button id="new-cargo" type="button" class="btn btn-primary" data-toggle="modal" data-target="#cargoNewDialog">Добавить груз</button>
+  </blockquote>
+  <h5 class="text-center">Подсчет количества прихода груза за месяц</h5>
+  <table id="table" class="table table-striped table-hover"></table>
+  <h5 class="text-center">Среднее количество прихода грузов в месяц: <span id="variable"></span></h5>
+  <script
+          src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js">
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <canvas id="histogram" style="width:100%; max-width:800px; margin: 50px auto"></canvas>
+</div>
+
+<div class="container-fluid" style="width: 100%; background-color: rgba(9,11,42,0.50); ">
+  <!-- Footer -->
+  <footer class=" text-center text-white ">
+    <!-- Grid container -->
+    <div class="container p-4">
+      <!-- Section: Social media -->
+      <section class="mb-4">
+
+        <!-- Twitter -->
+        <a class="btn btn-outline-light btn-floating m-1" href="https://sun9-42.userapi.com/impg/z2Fw0aB0n3YLdh8ZlbR5MGY3d_AAZwPkIhUgrg/JjHM5YwBxUo.jpg?size=237x213&quality=95&sign=15fa7d9d4e098e24341e4f180ab80453&type=album" role="button"
+        ><i class="fab fa-twitter"></i
+        ></a>
+
+        <!-- Google -->
+        <a class="btn btn-outline-light btn-floating m-1" href="https://www.google.com" role="button"
+        ><i class="fab fa-google"></i
+        ></a>
+
+        <!-- Instagram -->
+        <a class="btn btn-outline-light btn-floating m-1" href="https://www.google.com" role="button"
+        ><i class="fab fa-instagram"></i
+        ></a>
+
+        <script src="https://kit.fontawesome.com/4e798326bd.js" crossorigin="anonymous"></script>
+        <!-- Github -->
+        <a class="btn btn-outline-light btn-floating m-1" href="https://github.com/schudaeva" role="button"
+        ><i class="fab fa-github"></i
+        ></a>
+      </section>
+      <div class="container   p-4">
+        <!--Grid row-->
+        <div class="row mt-4">
+          <!--Grid column-->
+          <div class="col-lg-6 col-md-12 mb-4 mb-md-0">
+            <h5 class="text-uppercase mb-4">О нас</h5>
+
+            <p>
+              Информационно-справочная система перевозки грузов.
+            </p>
+
+            <p>
+              Работа выполнена студентами финансового университета группы ПИ21-4 Чудаевой Светланой, Зайцевой Екатериной, Оганесян Мисаком
+            </p>
+
+
+          </div>
+          <!--Grid column-->
+
+          <!--Grid column-->
+          <div class="col-lg-6 col-md-6 mb-4 mb-md-0">
+            <h5 class="text-uppercase mb-4">Контакты</h5>
+
+            <ul class="fa-ul" style="margin-left: 1.65em;">
+              <li class="mb-3">
+                <span class="fa-li"><i class="fas fa-home"></i></span><span class="ms-2">4-й Вешняковский пр-д, 4, Москва, 109456</span>
+              </li>
+              <li class="mb-3">
+                <span class="fa-li"><i class="fas fa-envelope"></i></span><span class="ms-2">root@mail.ru</span>
+              </li>
+              <li class="mb-3">
+                <span class="fa-li"><i class="fas fa-phone"></i></span><span class="ms-2">+ 7 (999)-999-99-99</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Copyright -->
+    <div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.2);">
+      © 2023 Copyright: Все права защищены
+
+    </div>
+
+  </footer>
+  <!-- Footer -->
+</div>
+
+
+<script type="text/javascript">
+  function clearSearch() {
+    window.location = "[[@{/}]]";
+  }
+
+  let dates = document.getElementsByClassName('date')
+
+  let x = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
+  let y = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+
+
+  for (let i = 0; i < dates.length; i++) {
+    month = dates[i].innerText.slice(5, 7)
+    y[parseInt(month)-1] += 1
+  }
+  let sumOfNumbers = y.reduce((acc, number) => acc + number, 0);
+  let variable = (sumOfNumbers / 12).toFixed(2);
+  document.getElementById('variable').innerHTML = variable;
+  let table = document.querySelector('#table');
+  let tr = document.createElement('tr');
+  for (let elem of x) {
+    let th = document.createElement('th');
+    th.textContent = elem;
+    tr.appendChild(th);
+    table.appendChild(tr);
+  }
+  let tr2 = document.createElement('tr');
+  for (let elem of y) {
+    let td = document.createElement('td');
+    td.textContent = elem;
+    tr2.appendChild(td);
+    table.appendChild(tr2);
+  }
+
+
+  new Chart ("histogram", {
+    type: "bar",
+    data: {
+      labels: x,
+      datasets: [{
+        label: 'Количество отправленных грузов за месяц',
+        backgroundColor:
+                'rgba(54, 162, 235, 0.4)',
+        borderColor:
+                'rgb(54, 162, 235)',
+        borderWidth: 1,
+        barPercentage: 1,
+        categoryPercentage: 1,
+        borderRadius: 5,
+        data: y,
+        color : 'rgba(255, 255, 255)',
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: {
+          labels: {
+            color: "white"
+          }
+        },
+      },
+      scales: {
+        y: {
+          ticks: { color: 'white'}
+        },
+        x: {
+          ticks: { color: 'white' }
+        }
+      },
+    },
+  });
+
+  function sortTable(n) {
+    let table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
+    table = document.getElementById("1");
+    switching = true;
+    dir = "asc";
+    while (switching) {
+      switching = false;
+      rows = table.rows;
+      for (i = 1; i < (rows.length - 1); i++) {
+        shouldSwitch = false;
+        x = rows[i].getElementsByTagName("th")[n];
+        y = rows[i + 1].getElementsByTagName("th")[n];
+        if (dir == "asc") {
+          if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+            shouldSwitch = true;
+            break;
+          }
+        } else if (dir == "desc") {
+          if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
+            shouldSwitch = true;
+            break;
+          }
+        }
+      }
+      if (shouldSwitch) {
+        rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+        switching = true;
+        switchcount++;
+      } else {
+        if (switchcount == 0 && dir == "asc") {
+          dir = "desc";
+          switching = true;
+        }
+      }
+    }
+  }
+
+</script>
+
+<div class="modal fade" id="cargoEditDialog" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title text-black" id="exampleModalLabel">Редактирование груза</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <input type="hidden" id="cargo-id">
+          <div class="form-group">
+            <label for="cargo-name" class="col-form-label">Название груза</label>
+            <input type="text" class="form-control" id="cargo-name">
+          </div>
+          <div class="form-group">
+            <label for="cargo-content" class="col-form-label">Содержимое груза</label>
+            <input type="text" class="form-control" id="cargo-content">
+          </div>
+          <div class="form-group">
+            <label for="cargo-city" class="col-form-label">Город отправки груза</label>
+            <input type="text" class="form-control" id="cargo-city">
+          </div>
+          <div class="form-group">
+            <label for="cargo-date" class="col-form-label">Дата отправки груза</label>
+            <input type="date" class="form-control" id="cargo-date">
+          </div>
+          <div class="form-group">
+            <label for="cargo-destination" class="col-form-label">Город прибытия груза</label>
+            <input type="text" class="form-control" id="cargo-destination">
+          </div>
+          <div class="form-group">
+            <label for="cargo-arrdate" class="col-form-label">Дата прибытия груза</label>
+            <input type="date" class="form-control" id="cargo-arrdate">
+          </div>
+
+
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+        <button id="save-cargo-button" type="button" class="btn btn-primary">Сохранить</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+<script>
+  $('#cargoEditDialog').on('shown.bs.modal', function (event) {
+    let button = $(event.relatedTarget) // Button that triggered the modal
+    let cargoId = button.data('cargoid') // Extract info from data-* attributes
+
+    if (cargoId) {
+      $.get({
+        url: '/api/v1/cargo/' + cargoId,
+        success: (data) => {
+          let modal = $(this)
+          modal.find('#cargo-id').val(data.id)
+          modal.find('#cargo-name').val(data.name)
+          modal.find('#cargo-content').val(data.content)
+          modal.find('#cargo-city').val(data.from_city)
+          modal.find('#cargo-date').val(data.date_of_shipping)
+          modal.find('#cargo-destination').val(data.to_city)
+          modal.find('#cargo-arrdate').val(data.date_of_arrival)
+
+        },
+        error: (err) => {
+          alert(err);
+        }
+      });
+    }
+  })
+
+  $('#save-cargo-button').click(function() {
+    let modal = $('#cargoEditDialog')
+    let cargo = {
+      name: modal.find('#cargo-name').val(),
+      content: modal.find('#cargo-content').val(),
+      from_city: modal.find('#cargo-city').val(),
+      date_of_shipping: modal.find('#cargo-date').val(),
+      to_city: modal.find('#cargo-destination').val(),
+      date_of_arrival: modal.find('#cargo-arrdate').val(),
+    };
+    if (modal.find('#cargo-id').val()) {
+      cargo.id = modal.find('#cargo-id').val()
+    }
+    $.ajax({
+      url: '/api/v1/cargo',
+      type: 'POST',
+      data: JSON.stringify(cargo),
+      contentType: "application/json; charset=utf-8",
+      dataType: "json",
+      success: () => {
+        location.reload()
+      },
+      error: (err) => {
+        alert(err);
+      }
+    })
+
+    modal.modal('hide');
+  });
+</script>
+
+
+
+
+
+<div class="modal fade" id="cargoNewDialog" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title text-black" id="ModalLabel">Добавление груза</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <input type="hidden" id="cargo-idn">
+          <div class="form-group">
+            <label for="cargo-name" class="col-form-label">Название груза</label>
+            <input type="text" class="form-control" id="cargo-namen">
+          </div>
+          <div class="form-group">
+            <label for="cargo-content" class="col-form-label">Содержимое груза</label>
+            <input type="text" class="form-control" id="cargo-contentn">
+          </div>
+          <div class="form-group">
+            <label for="cargo-city" class="col-form-label">Город отправки груза</label>
+            <input type="text" class="form-control" id="cargo-cityn">
+          </div>
+          <div class="form-group">
+            <label for="cargo-date" class="col-form-label">Дата отправки груза</label>
+            <input type="date" class="form-control" id="cargo-daten">
+          </div>
+          <div class="form-group">
+            <label for="cargo-destination" class="col-form-label">Город прибытия груза</label>
+            <input type="text" class="form-control" id="cargo-destinationn">
+          </div>
+          <div class="form-group">
+            <label for="cargo-arrdate" class="col-form-label">Дата прибытия груза</label>
+            <input type="date" class="form-control" id="cargo-arrdaten">
+          </div>
+
+
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+        <button id="save-new-cargo-button" type="button" class="btn btn-primary">Сохранить</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+<script>
+  $('#save-new-cargo-button').click(function() {
+    let modal = $('#cargoNewDialog')
+    let cargo = {
+      name: modal.find('#cargo-namen').val(),
+      content: modal.find('#cargo-contentn').val(),
+      from_city: modal.find('#cargo-cityn').val(),
+      date_of_shipping: modal.find('#cargo-daten').val(),
+      to_city: modal.find('#cargo-destinationn').val(),
+      date_of_arrival: modal.find('#cargo-arrdaten').val(),
+    };
+    $.ajax({
+      url: '/api/v1/cargo',
+      type: 'POST',
+      data: JSON.stringify(cargo),
+      contentType: "application/json; charset=utf-8",
+      dataType: "json",
+      success: () => {
+        location.reload()
+      },
+      error: (err) => {
+        alert(err);
+      }
+    })
+
+    modal.modal('hide');
+  });
+</script>
+
+
+
+
+
+</body>
+</html>

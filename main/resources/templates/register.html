@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="ru"
+      xmlns:th="http://www.thymeleaf.org"
+>
+<head>
+  <meta charset="UTF-8">
+  <title>Перевозка грузов</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+        crossorigin="anonymous">
+  <style>
+    body {
+      background-image: url("https://img.freepik.com/premium-vector/city-transport-line-seamless-pattern-vector-illustration-of-outline-background_520826-326.jpg");
+      background-color: rgba(39, 63, 112);
+      background-blend-mode: multiply;
+    }
+    h1, h4, h5, th, tr, td {
+      color: white;
+    }
+  </style>
+</head>
+<body>
+<script src="http://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+<script>
+  function googleTranslateElementInit() {
+    new google.translate.TranslateElement(
+            {pageLanguage: 'ru'},
+            'google_translate_element'
+    );
+  }
+</script>
+<nav class="navbar navbar-expand-lg navbar-dark justify-content-between" style="background-color: rgba(9,11,42,0.80)">
+  <div class="container-fluid">
+    <a class="navbar-brand" th:href="@{/index}">Перевозка грузов</a>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" th:href="@{/login}">Вход</a>
+        </li>
+      </ul>
+    </div>
+    <div id="google_translate_element"></div>
+  </div>
+</nav>
+<br /><br /><br />
+<div class="container">
+  <div class="row col-md-8 offset-md-2">
+    <div class="card">
+      <div class="card-header">
+        <h2 class="text-center" >Регистрация</h2>
+      </div>
+      <div th:if="${param.success}">
+        <div class="alert alert-success">
+          Регистрация прошла успешно!
+        </div>
+      </div>
+      <div class="card-body">
+        <form
+                method="post"
+                role="form"
+                th:action="@{/register/save}"
+                th:object="${user}"
+        >
+          <div class="form-group mb-3">
+            <label class="form-label">Имя</label>
+            <input
+                    class="form-control"
+                    id="firstName"
+                    name="firstName"
+                    placeholder="Введите имя"
+                    th:field="*{firstName}"
+                    type="text"
+            />
+            <p th:errors = "*{firstName}" class="text-danger"
+               th:if="${#fields.hasErrors('firstName')}"></p>
+          </div>
+
+          <div class="form-group mb-3">
+            <label class="form-label">Фамилия</label>
+            <input
+                    class="form-control"
+                    id="lastName"
+                    name="lastName"
+                    placeholder="Введите фамилию"
+                    th:field="*{lastName}"
+                    type="text"
+            />
+            <p th:errors = "*{lastName}" class="text-danger"
+               th:if="${#fields.hasErrors('lastName')}"></p>
+          </div>
+
+          <div class="form-group mb-3">
+            <label class="form-label">Почта</label>
+            <input
+                    class="form-control"
+                    id="email"
+                    name="email"
+                    placeholder="Введите почту"
+                    th:field="*{email}"
+                    type="email"
+            />
+            <p th:errors = "*{email}" class="text-danger"
+               th:if="${#fields.hasErrors('email')}"></p>
+          </div>
+
+          <div class="form-group mb-3">
+            <label class="form-label">Пароль</label>
+            <input
+                    class="form-control"
+                    id="password"
+                    name="password"
+                    placeholder="Введите пароль"
+                    th:field="*{password}"
+                    type="password"
+            />
+            <p th:errors = "*{password}" class="text-danger"
+               th:if="${#fields.hasErrors('password')}"></p>
+          </div>
+          <div class="form-group">
+            <button class="btn btn-outline-light" style="background-color: #121c33" type="submit">Зарегистрироваться</button>
+            <span style="color:white">Уже зарегестрированы? <a style="color:white" th:href="@{/login}">Выполнить вход</a></span>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="container-fluid" style="height: 200px;"></div>
+
+<div class="container-fluid" style="width: 100%; background-color: rgba(9,11,42,0.50); ">
+  <!-- Footer -->
+  <footer class=" text-center text-white ">
+    <!-- Grid container -->
+    <div class="container p-4">
+      <!-- Section: Social media -->
+      <section class="mb-4">
+
+        <!-- Twitter -->
+        <a class="btn btn-outline-light btn-floating m-1" href="https://sun9-42.userapi.com/impg/z2Fw0aB0n3YLdh8ZlbR5MGY3d_AAZwPkIhUgrg/JjHM5YwBxUo.jpg?size=237x213&quality=95&sign=15fa7d9d4e098e24341e4f180ab80453&type=album" role="button"
+        ><i class="fab fa-twitter"></i
+        ></a>
+
+        <!-- Google -->
+        <a class="btn btn-outline-light btn-floating m-1" href="https://www.google.com" role="button"
+        ><i class="fab fa-google"></i
+        ></a>
+
+        <!-- Instagram -->
+        <a class="btn btn-outline-light btn-floating m-1" href="https://www.google.com" role="button"
+        ><i class="fab fa-instagram"></i
+        ></a>
+
+        <script src="https://kit.fontawesome.com/4e798326bd.js" crossorigin="anonymous"></script>
+        <!-- Github -->
+        <a class="btn btn-outline-light btn-floating m-1" href="https://github.com/schudaeva" role="button"
+        ><i class="fab fa-github"></i
+        ></a>
+      </section>
+      <div class="container   p-4">
+        <!--Grid row-->
+        <div class="row mt-4">
+          <!--Grid column-->
+          <div class="col-lg-6 col-md-12 mb-4 mb-md-0">
+            <h5 class="text-uppercase mb-4">О нас</h5>
+
+            <p>
+              Информационно-справочная система перевозки грузов.
+            </p>
+
+            <p>
+              Работа выполнена студентами финансового университета группы ПИ21-4 Чудаевой Светланой, Зайцевой Екатериной, Оганесян Мисаком
+            </p>
+
+
+          </div>
+          <!--Grid column-->
+
+          <!--Grid column-->
+          <div class="col-lg-6 col-md-6 mb-4 mb-md-0">
+            <h5 class="text-uppercase mb-4">Контакты</h5>
+
+            <ul class="fa-ul" style="margin-left: 1.65em;">
+              <li class="mb-3">
+                <span class="fa-li"><i class="fas fa-home"></i></span><span class="ms-2">4-й Вешняковский пр-д, 4, Москва, 109456</span>
+              </li>
+              <li class="mb-3">
+                <span class="fa-li"><i class="fas fa-envelope"></i></span><span class="ms-2">root@mail.ru</span>
+              </li>
+              <li class="mb-3">
+                <span class="fa-li"><i class="fas fa-phone"></i></span><span class="ms-2">+ 7 (999)-999-99-99</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Copyright -->
+    <div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.2);">
+      © 2023 Copyright: Все права защищены
+
+    </div>
+
+  </footer>
+  <!-- Footer -->
+</div>
+
+
+</body>
+</html>

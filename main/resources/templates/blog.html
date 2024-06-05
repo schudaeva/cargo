@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Система «Перевозка грузов»</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <style>
+        body {
+            background-image: url("https://img.freepik.com/premium-vector/city-transport-line-seamless-pattern-vector-illustration-of-outline-background_520826-326.jpg");
+            background-color: rgba(39, 63, 112);
+            background-blend-mode: multiply;
+        }
+        h1, h4, th, tr, td {
+            color: white;
+        }
+        .rightimg {
+            float: right;
+            padding: 5px;
+            width: 30%;
+            margin-right: 5%;
+        }
+        p {
+            -webkit-line-clamp: 3; /* Число отображаемых строк */
+            display: -webkit-box;
+            -webkit-box-orient: vertical; /* Вертикальная ориентация */
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+<script src="http://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+<script>
+    function googleTranslateElementInit() {
+        new google.translate.TranslateElement(
+            {pageLanguage: 'ru'},
+            'google_translate_element'
+        );
+    }
+</script>
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"
+        integrity="sha384-tsQFqpEReu7ZLhBV2VZlAu7zcOV+rXbYlF2cqB8txI/8aZajjp4Bqd+V6D5IgvKT"
+        crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+        crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+        crossorigin="anonymous"></script>
+<nav class="navbar navbar-expand-lg navbar-dark justify-content-between" style="background-color: rgba(9,11,42,0.80)">
+    </ul>
+    <div class="container-fluid">
+        <a class="navbar-brand" th:href="@{/index}">Перевозка грузов</a>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" th:href="@{/blog}">Блог</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" th:href="@{/users}">Пользователи</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" th:href="@{/logout}">Выход</a>
+                </li>
+            </ul>
+        </div>
+        <div id="google_translate_element"></div>
+    </div>
+</nav>
+<div class="wrapper" style="max-width: 1200px; margin: 0 auto">
+    <br>
+    <blockquote class="blockquote text-center"><h1>Автоблог</h1></blockquote>
+    <div class="row">
+        <div class="text-center">
+            <h4>Поиск статьи:</h4>
+            <form th:action="@{/blog}">
+                <input type="text" name="keyword" id="keyword" size="30" th:value="${keyword}" required/>
+                <input type="submit" class="btn btn-success btn-sm" value="Поиск"/>
+                <input type="button" class="btn btn-warning btn-sm" value="Очистить" id="btnClear"
+                       onclick="clearSearch()"/>
+            </form>
+        </div>
+    </div>
+    <br>
+    <div class="row">
+        <div class="col-lg-10 mx-auto">
+            <!-- List group-->
+            <ul class="list-group shadow">
+                <!-- list group item-->
+                <li class="list-group-item" th:each="blog: ${listBlog}">
+                    <!-- Custom content-->
+                    <div class="media align-items-lg-center flex-column flex-lg-row p-3">
+                        <div class="media-body order-2 order-lg-1">
+
+                    </div>
+                            <h3 class="mt-0 font-weight-bold mb-2" th:text="${blog.title}"></h3>
+                            <img th:src="${blog.pic}" width="200" class="rightimg" >
+                            <p class="font-italic mb-0 small" th:text="${blog.bl_text}"></p>
+                            <div class="d-flex align-items-center justify-content-between mt-1">
+
+                                <ul class="list-inline small">
+                                    <li class="list-inline-item m-0 text-muted" th:text="${blog.pub_date}"></li>
+
+                                </ul>
+                            </div>
+                        <div>
+                            <br>
+                            <a th:href="@{'/blog_entry/'+${blog.id}}"><button type="button" class="btn btn-success">Подробнее</button></a>
+                            <br>
+                            <br>
+                            <div>
+                                <button id="edit-blog" type="button" class="btn btn-primary" data-toggle="modal" data-target="#blogEditDialog" th:data-blogId="${blog.id}"><i class="fas fa-edit"></i></button>
+                                <a th:href="@{'/delete_blog_entry/'+${blog.id}}"><button type="button" class="btn btn-danger"><i class="far fa-trash-alt"></i></button></a>
+                            </div>
+                        </div>
+
+                    </div>
+                </li> <!-- End -->
+            </ul>
+        </div>
+    </div>
+<br>
+
+    <blockquote class="blockquote text-center">
+            <button id="new-blog" type="button" class="btn btn-primary" data-toggle="modal" data-target="#blogNewDialog">
+                Добавить запись
+            </button>
+    </blockquote>
+
+    <script type="text/javascript">
+        function clearSearch() {
+            window.location = "[[@{/blog}]]";
+        }
+    </script>
+</div>
+<div class="container-fluid" style="width: 100%; background-color: rgba(9,11,42,0.50); ">
+    <!-- Footer -->
+    <footer class=" text-center text-white ">
+        <!-- Grid container -->
+        <div class="container p-4">
+            <!-- Section: Social media -->
+            <section class="mb-4">
+
+                <!-- Twitter -->
+                <a class="btn btn-outline-light btn-floating m-1" href="https://sun9-42.userapi.com/impg/z2Fw0aB0n3YLdh8ZlbR5MGY3d_AAZwPkIhUgrg/JjHM5YwBxUo.jpg?size=237x213&quality=95&sign=15fa7d9d4e098e24341e4f180ab80453&type=album" role="button"
+                ><i class="fab fa-twitter"></i
+                ></a>
+
+                <!-- Google -->
+                <a class="btn btn-outline-light btn-floating m-1" href="https://www.google.com" role="button"
+                ><i class="fab fa-google"></i
+                ></a>
+
+                <!-- Instagram -->
+                <a class="btn btn-outline-light btn-floating m-1" href="https://www.google.com" role="button"
+                ><i class="fab fa-instagram"></i
+                ></a>
+
+                <script src="https://kit.fontawesome.com/4e798326bd.js" crossorigin="anonymous"></script>
+                <!-- Github -->
+                <a class="btn btn-outline-light btn-floating m-1" href="https://github.com/schudaeva" role="button"
+                ><i class="fab fa-github"></i
+                ></a>
+            </section>
+            <div class="container   p-4">
+                <!--Grid row-->
+                <div class="row mt-4">
+                    <!--Grid column-->
+                    <div class="col-lg-6 col-md-12 mb-4 mb-md-0">
+                        <h5 class="text-uppercase mb-4">О нас</h5>
+
+                        <p>
+                            Информационно-справочная система перевозки грузов.
+                        </p>
+
+                        <p>
+                            Работа выполнена студентами финансового университета группы ПИ21-4 Чудаевой Светланой, Зайцевой Екатериной, Оганесян Мисаком
+                        </p>
+
+
+                    </div>
+                    <!--Grid column-->
+
+                    <!--Grid column-->
+                    <div class="col-lg-6 col-md-6 mb-4 mb-md-0">
+                        <h5 class="text-uppercase mb-4">Контакты</h5>
+
+                        <ul class="fa-ul" style="margin-left: 1.65em;">
+                            <li class="mb-3">
+                                <span class="fa-li"><i class="fas fa-home"></i></span><span class="ms-2">4-й Вешняковский пр-д, 4, Москва, 109456</span>
+                            </li>
+                            <li class="mb-3">
+                                <span class="fa-li"><i class="fas fa-envelope"></i></span><span class="ms-2">root@mail.ru</span>
+                            </li>
+                            <li class="mb-3">
+                                <span class="fa-li"><i class="fas fa-phone"></i></span><span class="ms-2">+ 7 (999)-999-99-99</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Copyright -->
+        <div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.2);">
+            © 2023 Copyright: Все права защищены
+
+        </div>
+
+    </footer>
+    <!-- Footer -->
+</div>
+
+
+
+
+<div class="modal fade" id="blogEditDialog" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-black" id="exampleModalLabel">Редактирование записи</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <input type="hidden" id="blog-id">
+                    <div class="form-group">
+                        <label for="blog-title" class="col-form-label">Название</label>
+                        <input type="text" class="form-control" id="blog-title">
+                    </div>
+                    <div class="form-group">
+                        <label for="blog-pub_date" class="col-form-label">Дата публикации</label>
+                        <input type="date" class="form-control" id="blog-pub_date">
+                    </div>
+                    <div class="form-group">
+                        <label for="blog-text" class="col-form-label">Текст статьи</label>
+                        <textarea class="form-control" id="blog-text"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="blog-pic" class="col-form-label">Картинка</label>
+                        <input type="text" class="form-control" id="blog-pic">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+                <button id="save-blog-button" type="button" class="btn btn-primary">Сохранить</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<script>
+    $('#blogEditDialog').on('shown.bs.modal', function (event) {
+        let button = $(event.relatedTarget) // Button that triggered the modal
+        let blogId = button.data('blogid') // Extract info from data-* attributes
+
+        if (blogId) {
+            $.get({
+                url: '/api/v1/blog/' + blogId,
+                success: (data) => {
+                    let modal = $(this)
+                    modal.find('#blog-id').val(data.id)
+                    modal.find('#blog-title').val(data.title)
+                    modal.find('#blog-pub_date').val(data.pub_date)
+                    modal.find('#blog-text').val(data.bl_text)
+                    modal.find('#blog-pic').val(data.pic)
+                },
+                error: (err) => {
+                    alert(err);
+                }
+            });
+        }
+    })
+
+    $('#save-blog-button').click(function() {
+        let modal = $('#blogEditDialog')
+        let blog = {
+            title: modal.find('#blog-title').val(),
+            pub_date: modal.find('#blog-pub_date').val(),
+            bl_text: modal.find('#blog-text').val(),
+            pic: modal.find('#blog-pic').val(),
+        };
+        if (modal.find('#blog-id').val()) {
+            blog.id = modal.find('#blog-id').val()
+        }
+        $.ajax({
+            url: '/api/v1/blog',
+            type: 'POST',
+            data: JSON.stringify(blog),
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: () => {
+                location.reload()
+            },
+            error: (err) => {
+                alert(err);
+            }
+        })
+
+        modal.modal('hide');
+    });
+</script>
+
+
+
+
+
+<div class="modal fade" id="blogNewDialog" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-black" id="ModalLabel">Добавление записи</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <input type="hidden" id="blog-idn">
+                    <div class="form-group">
+                        <label for="blog-title" class="col-form-label">Название</label>
+                        <input type="text" class="form-control" id="blog-titlen">
+                    </div>
+                    <div class="form-group">
+                        <label for="blog-pub_date" class="col-form-label">Дата публикации</label>
+                        <input type="date" class="form-control" id="blog-pub_daten">
+                    </div>
+                    <div class="form-group">
+                        <label for="blog-text" class="col-form-label">Текст статьи</label>
+                        <textarea class="form-control" id="blog-textn"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="blog-pic" class="col-form-label">Картинка</label>
+                        <input type="text" class="form-control" id="blog-picn">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+                <button id="save-new-blog-button" type="button" class="btn btn-primary">Сохранить</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<script>
+    $('#save-new-blog-button').click(function() {
+        let modal = $('#blogNewDialog')
+        let blog = {
+            title: modal.find('#blog-titlen').val(),
+            pub_date: modal.find('#blog-pub_daten').val(),
+            bl_text: modal.find('#blog-textn').val(),
+            pic: modal.find('#blog-picn').val(),
+        };
+        $.ajax({
+            url: '/api/v1/blog',
+            type: 'POST',
+            data: JSON.stringify(blog),
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: () => {
+                location.reload()
+            },
+            error: (err) => {
+                alert(err);
+            }
+        })
+
+        modal.modal('hide');
+    });
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>
