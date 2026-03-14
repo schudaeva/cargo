@@ -1,5 +1,5 @@
 # cargo
-**Проект по СТП** 
+
 
 
 Стек: Java (ORM + Spring Boot), базы данных (MySQL), веб-программирование (HTML, CSS, JavaScript)
